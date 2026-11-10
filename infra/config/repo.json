@@ -1,0 +1,210 @@
+{
+  "schema": 1,
+  "name": "package-md",
+  "organization": "gardusi-gustavo",
+  "layer": 1,
+  "kind": "template",
+  "visibility": "public",
+  "platforms": [
+    "gitea",
+    "github"
+  ],
+  "features": {
+    "ci": true,
+    "pages": false,
+    "release": true,
+    "observability": false
+  },
+  "limits": {
+    "repo_mb": 150,
+    "file_mb": 25,
+    "max_symlinks": 0
+  },
+  "ci": {
+    "script": "infra/scripts/ci.sh",
+    "timeout_minutes": 15,
+    "required_jobs": [
+      "ci"
+    ],
+    "primary": "github",
+    "profile": "universal"
+  },
+  "pages": {
+    "enabled": false,
+    "output": "public",
+    "generator": "custom",
+    "publish": {
+      "gitea": false,
+      "github": false
+    }
+  },
+  "binaries": {
+    "allowed": [],
+    "allow_private_data": false
+  },
+  "versioning": {
+    "scheme": "semver",
+    "tag_prefix": "v",
+    "release_artifacts": true
+  },
+  "readme": {
+    "max_lines": 100
+  },
+  "data_classification": "public",
+  "depends_on": [],
+  "consumers": [],
+  "files": {
+    "infra_max_file_mb": 1,
+    "rules": {
+      "": {
+        "allow_names": [
+          "README.md",
+          "AGENTS.md",
+          ".gitignore",
+          ".gitattributes",
+          ".dockerignore",
+          "VERSION"
+        ],
+        "allow_globs": []
+      },
+      "docs/": {
+        "allow_extensions": [
+          ".md"
+        ],
+        "allow_names": [
+          ".gitkeep"
+        ]
+      },
+      "docs/issues/": {
+        "allow_extensions": [
+          ".json",
+          ".md"
+        ]
+      },
+      "src/": {
+        "allow_extensions": [
+          ".py",
+          ".html",
+          ".css",
+          ".js",
+          ".json",
+          ".rs",
+          ".hpp",
+          ".cpp"
+        ],
+        "allow_names": [
+          ".gitkeep"
+        ]
+      },
+      "infra/config/": {
+        "allow_extensions": [
+          ".json"
+        ]
+      },
+      "infra/scripts/": {
+        "allow_extensions": [
+          ".sh",
+          ".py"
+        ]
+      },
+      "infra/docker/": {
+        "allow_globs": [
+          "*.dockerfile"
+        ]
+      },
+      ".gitea/workflows/": {
+        "allow_extensions": [
+          ".yml",
+          ".yaml"
+        ]
+      },
+      ".gitea/": {
+        "allow_names": [
+          "pull_request_template.md"
+        ],
+        "allow_extensions": [
+          ".md",
+          ".yml",
+          ".yaml"
+        ]
+      },
+      ".github/": {
+        "allow_globs": [
+          "*"
+        ]
+      },
+      ".github/workflows/": {
+        "allow_extensions": [
+          ".yml",
+          ".yaml"
+        ]
+      },
+      ".github/ISSUE_TEMPLATE/": {
+        "allow_extensions": [
+          ".yml",
+          ".yaml",
+          ".md"
+        ]
+      },
+      "docs/runbooks/": {
+        "allow_extensions": [
+          ".md"
+        ]
+      },
+      "docs/security/": {
+        "allow_extensions": [
+          ".md"
+        ]
+      },
+      "scripts/": {
+        "allow_extensions": [
+          ".py"
+        ]
+      },
+      "templates/": {
+        "allow_extensions": [
+          ".md"
+        ]
+      },
+      "standards/": {
+        "allow_extensions": [
+          ".md"
+        ]
+      },
+      "diagrams/": {
+        "allow_extensions": [
+          ".mmd",
+          ".md"
+        ]
+      }
+    },
+    "forbid": [
+      {
+        "regex": "(^|/)[^/]*\\.md$",
+        "reason": "Markdown is allowed only in docs/, templates/, standards/, diagrams/, .github/, README.md, and AGENTS.md",
+        "allow": [
+          "^README\\.md$",
+          "^AGENTS\\.md$",
+          "^docs/",
+          "^templates/",
+          "^standards/",
+          "^diagrams/",
+          "^\\.github/"
+        ]
+      },
+      {
+        "regex": "^infra/data/",
+        "reason": "infra/data is retired; use src/data"
+      },
+      {
+        "regex": "^infra/.*\\.(pdf|png|jpg|jpeg|gif|webp|mp4|mp3|zip|gz|tar|7z)$",
+        "reason": "infra is repository management only"
+      },
+      {
+        "regex": "^\\.gitlab-ci\\.yml$",
+        "reason": "GitLab is not a source"
+      }
+    ]
+  },
+  "dependencies": {}
+}

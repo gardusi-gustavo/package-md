@@ -1,0 +1,18 @@
+{
+  "rank": "2.1",
+  "title": "Document template consumption",
+  "context": "Consumers need a copy or fetch pattern.",
+  "limits": {
+    "max_commits": 5,
+    "max_file_changes": 4
+  },
+  "spec": {
+    "summary": "Document tag-pinned raw URL usage.",
+    "expected_outcome": "Consumers can use templates without cloning.",
+    "acceptance_criteria": [
+      "Raw URLs are documented",
+      "Tag pinning is required"
+    ]
+  },
+  "attempts": []
+}

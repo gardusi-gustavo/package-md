@@ -1,0 +1,18 @@
+{
+  "rank": "2.2",
+  "title": "Add Markdown lint standards",
+  "context": "Markdown style is not enforced.",
+  "limits": {
+    "max_commits": 5,
+    "max_file_changes": 4
+  },
+  "spec": {
+    "summary": "Document and enforce heading and table rules.",
+    "expected_outcome": "Template changes stay consistent.",
+    "acceptance_criteria": [
+      "Rules are documented",
+      "CI enforces them"
+    ]
+  },
+  "attempts": []
+}

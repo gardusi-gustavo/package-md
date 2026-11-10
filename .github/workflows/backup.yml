@@ -1,0 +1,17 @@
+name: backup
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "43 2 * * *"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  backup:
+    uses: gardusi-gustavo/.github/.github/workflows/reusable-backup.yml@v0.2.0
+    with:
+      repository: gardusi-gustavo/package-md
+      retention: 3
+    secrets: inherit

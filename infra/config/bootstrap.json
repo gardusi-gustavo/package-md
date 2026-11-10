@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "repository": "gardusi-gustavo/package-md",
+  "status": "staged",
+  "bootstrapped_at": "2026-11-10T00:41:07Z",
+  "security": {
+    "branch_protection": "main; PR required; 1 human approval; squash only; linear history; no force push; no deletion",
+    "tag_protection": "v*",
+    "secret_scanning": "github-native; enabled after mirror",
+    "dependabot": true,
+    "codeowners": "@gardusi-gustavo",
+    "public_data_only": true
+  },
+  "assets": {
+    "issue_templates": ".github/ISSUE_TEMPLATE",
+    "pull_request_template": ".github/PULL_REQUEST_TEMPLATE.md",
+    "workflows": ".github/workflows",
+    "bootstrap_runbook": "docs/runbooks/repository-bootstrap.md"
+  }
+}

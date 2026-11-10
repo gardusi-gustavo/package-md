@@ -1,0 +1,18 @@
+{
+  "rank": "1.2",
+  "title": "Add a repository checklist template",
+  "context": "Repositories need a consistent bootstrap checklist.",
+  "limits": {
+    "max_commits": 5,
+    "max_file_changes": 4
+  },
+  "spec": {
+    "summary": "Add a checklist template for new repositories.",
+    "expected_outcome": "New repositories can follow one checklist.",
+    "acceptance_criteria": [
+      "Checklist is complete",
+      "It references governance"
+    ]
+  },
+  "attempts": []
+}

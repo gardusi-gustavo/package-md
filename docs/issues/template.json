@@ -1,0 +1,18 @@
+{
+  "rank": "1.1",
+  "title": "Replace with the task title",
+  "context": "What is wrong or missing, and why it matters.",
+  "limits": {
+    "max_commits": 5,
+    "max_file_changes": 4
+  },
+  "spec": {
+    "summary": "What this task changes.",
+    "expected_outcome": "What must be true after the change.",
+    "acceptance_criteria": [
+      "Observable result one",
+      "Observable result two"
+    ]
+  },
+  "attempts": []
+}

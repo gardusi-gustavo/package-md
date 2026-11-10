@@ -1,0 +1,18 @@
+{
+  "rank": "1.1",
+  "title": "Freeze the template set",
+  "context": "Consumers need a stable template surface.",
+  "limits": {
+    "max_commits": 5,
+    "max_file_changes": 4
+  },
+  "spec": {
+    "summary": "Document which templates are supported at 0.1.0.",
+    "expected_outcome": "Consumers can pin the template set.",
+    "acceptance_criteria": [
+      "Templates are listed",
+      "Breaking changes are documented"
+    ]
+  },
+  "attempts": []
+}
