@@ -12,10 +12,10 @@ permissions:
 jobs:
   ci:
     if: github.event_name == 'pull_request'
-    uses: gardusi-gustavo/.github/.github/workflows/event-ci.yml@release/v1
+    uses: gardusi-gustavo/package-yml/.github/workflows/event-ci.yml@release/v1
 
   release:
     if: github.event_name == 'push'
     permissions:
       contents: write
-    uses: gardusi-gustavo/.github/.github/workflows/event-release.yml@release/v1
+    uses: gardusi-gustavo/package-yml/.github/workflows/event-release.yml@release/v1
