@@ -82,11 +82,6 @@ def run(args: list[str], cwd: pathlib.Path) -> subprocess.CompletedProcess:
     return subprocess.run(args, cwd=cwd, text=True, capture_output=True, timeout=300)
 
 
-def gh(args: list[str], config_dir: str) -> subprocess.CompletedProcess:
-    env = dict(os.environ, GH_CONFIG_DIR=config_dir)
-    return subprocess.run(["gh", *args], text=True, env=env, capture_output=True, timeout=180)
-
-
 def check(reg: dict, only: list[str], as_json: bool) -> int:
     rows = []
     for slug, _cfg, path in repos(reg, only):
@@ -101,7 +96,7 @@ def check(reg: dict, only: list[str], as_json: bool) -> int:
     return 0
 
 
-def apply_one(slug: str, cfg: str, path: pathlib.Path, yes: bool) -> str:
+def apply_one(slug: str, path: pathlib.Path, yes: bool) -> str:
     status, drifted = state(path)
     if status == "ok":
         return "ok"
@@ -120,19 +115,13 @@ def apply_one(slug: str, cfg: str, path: pathlib.Path, yes: bool) -> str:
     push = run(["git", "push", "git@github.com:" + slug + ".git", f"HEAD:refs/heads/{BRANCH}"], path)
     if push.returncode != 0:
         return f"push failed: {push.stderr.strip()[:60]}"
-    pr = gh(["pr", "create", "--repo", slug, "--base", "main", "--head", BRANCH,
-             "--title", "Add the default community health files",
-             "--body", "Adds CONTRIBUTING, SECURITY, and CODE_OF_CONDUCT under .github/, "
-                       "sourced from gardusi-gustavo/package-md."], cfg)
-    if pr.returncode != 0:
-        return f"pr failed: {pr.stderr.strip()[:60]}"
-    return pr.stdout.strip().splitlines()[-1]
+    return f"pushed; open https://github.com/{slug}/compare/main...{BRANCH}?expand=1"
 
 
 def apply(reg: dict, only: list[str], yes: bool) -> int:
-    for slug, cfg, path in repos(reg, only):
+    for slug, _cfg, path in repos(reg, only):
         try:
-            print(f"{slug:55} {apply_one(slug, cfg, path, yes)}")
+            print(f"{slug:55} {apply_one(slug, path, yes)}")
         except Exception as exc:
             print(f"{slug:55} error: {exc}")
     return 0
