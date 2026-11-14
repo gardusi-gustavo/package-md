@@ -1,0 +1,67 @@
+name: generate
+
+# Manual only. Creates a branch and a pull request with the repository's own
+# GITHUB_TOKEN. The PR is authored by github-actions[bot], so the main account
+# can approve it. It does not trigger pull_request CI (GitHub suppresses
+# GITHUB_TOKEN events); the operator triggers CI with an empty commit.
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: Branch to create
+        required: true
+        default: "bot/change"
+      title:
+        description: Pull request title
+        required: true
+      body:
+        description: Pull request body
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate changes
+        run: |
+          set -euo pipefail
+          if [ -x scripts/generate.sh ]; then
+            bash scripts/generate.sh
+          else
+            echo "missing scripts/generate.sh"
+            exit 1
+          fi
+
+      - name: Commit and push
+        id: commit
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -B "${{ inputs.branch }}"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "no changes"
+            exit 0
+          fi
+          git commit -m "${{ inputs.title }}"
+          git push -u origin "${{ inputs.branch }}"
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Open pull request
+        if: steps.commit.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          gh pr create --repo "$GITHUB_REPOSITORY" \
+            --base main --head "${{ inputs.branch }}" \
+            --title "${{ inputs.title }}" --body "${{ inputs.body }}" || true
