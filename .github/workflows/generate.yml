@@ -1,20 +1,12 @@
 name: generate
 
-# Manual only. Turns a selected issue into a draft pull request using the
-# repository's own GITHUB_TOKEN and opencode. Draft means "waiting": no CI runs
-# until the operator marks it ready for review.
+# Manual. Turns one issue into one draft pull request.
+# Draft = waiting. Marking it ready for review triggers CI.
 on:
   workflow_dispatch:
     inputs:
       issue:
         description: Issue number to build
-        required: true
-      branch:
-        description: Branch to create
-        required: true
-        default: "bot/change"
-      title:
-        description: Pull request title
         required: true
 
 permissions:
@@ -28,44 +20,64 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Generate changes
+      - name: Check for an existing draft
+        id: check
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ISSUE: ${{ inputs.issue }}
         run: |
           set -euo pipefail
-          if [ -x scripts/generate.sh ]; then
-            bash scripts/generate.sh "$ISSUE"
+          branch="agent/issue-${ISSUE}"
+          existing="$(gh pr list --repo "$GITHUB_REPOSITORY" --head "$branch" --state open --json number --jq '.[0].number // empty')"
+          if [ -n "$existing" ]; then
+            echo "A draft already exists: #$existing"
+            echo "exists=$existing" >> "$GITHUB_OUTPUT"
           else
-            echo "missing scripts/generate.sh"
-            exit 1
+            echo "exists=" >> "$GITHUB_OUTPUT"
           fi
+
+      - name: Generate the change
+        if: steps.check.outputs.exists == ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          ISSUE: ${{ inputs.issue }}
+        run: |
+          set -euo pipefail
+          bash infra/scripts/generate.sh "$ISSUE"
 
       - name: Commit and push
         id: commit
+        if: steps.check.outputs.exists == ''
         run: |
           set -euo pipefail
+          branch="agent/issue-${{ inputs.issue }}"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git checkout -B "${{ inputs.branch }}"
+          git checkout -B "$branch"
           git add -A
           if git diff --cached --quiet; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
             echo "no changes"
             exit 0
           fi
-          git commit -m "${{ inputs.title }}"
-          git push -u origin "${{ inputs.branch }}"
+          git commit -m "agent: implement #${{ inputs.issue }}"
+          git push -u origin "$branch"
           echo "changed=true" >> "$GITHUB_OUTPUT"
 
-      - name: Open draft pull request
-        if: steps.commit.outputs.changed == 'true'
+      - name: Open the draft pull request
+        if: steps.check.outputs.exists == '' && steps.commit.outputs.changed == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE: ${{ inputs.issue }}
         run: |
           set -euo pipefail
+          branch="agent/issue-${ISSUE}"
+          title="$(gh issue view "$ISSUE" --repo "$GITHUB_REPOSITORY" --json title --jq .title)"
           gh pr create --repo "$GITHUB_REPOSITORY" \
-            --base main --head "${{ inputs.branch }}" \
-            --title "${{ inputs.title }}" \
-            --body "Draft prepared from issue #${{ inputs.issue }} by opencode." \
-            --draft || true
+            --base main --head "$branch" \
+            --title "$title" \
+            --body "Closes #${ISSUE}
+
+          Draft prepared by opencode. Mark ready for review to run CI." \
+            --draft
