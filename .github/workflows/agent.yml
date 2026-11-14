@@ -1,0 +1,20 @@
+name: agent
+
+# Third event: a comment command. Manual by design; no timer and no model call
+# on ordinary comments.
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  agent:
+    if: >-
+      startsWith(github.event.comment.body, '/agent') &&
+      github.event.comment.user.type != 'Bot'
+    uses: gardusi-gustavo/package-yml/.github/workflows/event-agent.yml@release/v1
+    secrets: inherit
