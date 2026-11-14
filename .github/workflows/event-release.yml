@@ -1,0 +1,12 @@
+name: event-release
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    uses: gardusi-gustavo/package-yml/.github/workflows/event-release.yml@release/v1
